@@ -19,6 +19,15 @@ PAL = {
     "celestial": dict(o="#5a4214", d="#b8923a", b="#e9d38c", l="#fff6d6", a="#7fd8ff", g="#ffb7d5", h="#4a3a5c", H="#7a6a96"),
     "skysteel":  dict(o="#14243a", d="#3a5a80", b="#6f95bf", l="#b5d4f0", a="#f0fbff", g="#ffe45c", h="#3a2a1c", H="#6e5236"),
     "starshard": dict(o="#4a3810", d="#c9a43a", b="#ffe07a", l="#fff7cf", a="#ffffff", g="#7fd8ff", h="#4a3a5c", H="#7a6a96"),
+    # Mob outfits (worn by the Marsh Wight, the Tidecaller and weekly bosses)
+    "marsh_wight": dict(o="#0b140c", d="#24361f", b="#3f5a33", l="#6f8f4f", a="#c9a6ff", g="#9bd46a", h="#2a1d14", H="#5a3e28"),
+    "tidecaller":  dict(o="#04161c", d="#0b3a47", b="#13667a", l="#3fa6b8", a="#ff8a7a", g="#a8f0ff", h="#2a1d14", H="#5a3e28"),
+    "ember":       dict(o="#1a0602", d="#4a1206", b="#8a2a0c", l="#d0581e", a="#ffd27f", g="#ff7a2a", h="#2a1d14", H="#5a3e28"),
+    "frost":       dict(o="#0a1a2a", d="#2a5a80", b="#6aa6d4", l="#bfe6ff", a="#ffffff", g="#8ad8ff", h="#2a1d14", H="#5a3e28"),
+    "storm":       dict(o="#0c1020", d="#22304a", b="#46587a", l="#8aa0c4", a="#ffe45c", g="#cfe3ff", h="#2a1d14", H="#5a3e28"),
+    "bone":        dict(o="#2a2418", d="#6a6250", b="#b8ae92", l="#e8e2cc", a="#ff4f4f", g="#fff6e0", h="#2a1d14", H="#5a3e28"),
+    "verdant":     dict(o="#0a1a08", d="#1e4a16", b="#3a7a2a", l="#7ab84a", a="#ffe07a", g="#c8f07a", h="#2a1d14", H="#5a3e28"),
+    "void":        dict(o="#020004", d="#10051c", b="#22093a", l="#4a1a70", a="#ff4fd8", g="#7d6bd6", h="#16081f", H="#3a1650"),
     "colossus":  dict(o="#14302c", d="#2f6b5e", b="#4fa08a", l="#9fd9c4", a="#e9fff6", g="#ffd27f", h="#3a2a1c", H="#6e5236"),
 }
 

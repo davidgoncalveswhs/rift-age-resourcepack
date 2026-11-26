@@ -5,13 +5,17 @@
 Run: python3 make_pack.py
 """
 import json, os, shutil, sys, uuid, zipfile, hashlib
+from PIL import Image
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import art, catalog
+import art, catalog, mobs
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "build")
 NS = "bteam"
-VERSION = [1, 0, 0]
+VERSION = [2, 0, 0]
+# Vanilla textures are only used as the base to repaint (shading/layout); set these before building.
+VANILLA_JAVA = os.environ.get("VANILLA_JAVA", "")      # extracted client jar root (has assets/minecraft/...)
+VANILLA_BEDROCK = os.environ.get("VANILLA_BEDROCK", "")  # bedrock-samples resource_pack/textures/entity copy
 
 
 def write(path, data):
@@ -63,12 +67,18 @@ def java():
         parent = "minecraft:item/handheld" if it["kind"] == "handheld" else "minecraft:item/generated"
         write(os.path.join(a, "models/item", id + ".json"), {"parent": parent, "textures": {"layer0": f"{NS}:item/{id}"}})
         write(os.path.join(a, "items", id + ".json"), {"model": {"type": "minecraft:model", "model": f"{NS}:item/{id}"}})
-    for j, (s, (pal, _)) in enumerate(catalog.SETS.items()):
+    for s, pal in all_sets():
         l1, l2 = art.armor_layers(pal, seed(s))
         l1.save(os.path.join(mk(a, "textures/entity/equipment/humanoid"), s + ".png"))
         l2.save(os.path.join(mk(a, "textures/entity/equipment/humanoid_leggings"), s + ".png"))
         write(os.path.join(a, "equipment", s + ".json"), {"layers": {
             "humanoid": [{"texture": f"{NS}:{s}"}], "humanoid_leggings": [{"texture": f"{NS}:{s}"}]}})
+    for name, d in mobs.DESIGNS.items():
+        for path in d[3]:
+            src = os.path.join(VANILLA_JAVA, path + ".png")
+            out = os.path.join(root, path + ".png")
+            os.makedirs(os.path.dirname(out), exist_ok=True)
+            mobs.repaint(Image.open(src), name).save(out)
     dest = os.path.join(OUT, "rift-age-java.zip")
     zipdir(root, dest)
     return dest
@@ -107,10 +117,18 @@ def bedrock():
         if comps:
             entry["components"] = comps
         mappings.setdefault("minecraft:" + it["base"], []).append(entry)
-    for s, (pal, _) in catalog.SETS.items():
+    for s, pal in all_sets():
         l1, l2 = art.armor_layers(pal, seed(s))
         l1.save(os.path.join(mk(root, "textures/models/armor"), f"{NS}_{s}_1.png"))
         l2.save(os.path.join(root, "textures/models/armor", f"{NS}_{s}_2.png"))
+    for name, d in mobs.DESIGNS.items():
+        for path in d[4]:
+            src = os.path.join(VANILLA_BEDROCK, path.split("textures/entity/", 1)[1] + ".png")
+            if not os.path.exists(src):
+                src = src[:-4] + ".tga"
+            out = os.path.join(root, path + ".png")
+            os.makedirs(os.path.dirname(out), exist_ok=True)
+            mobs.repaint(Image.open(src), name).save(out)
     write(os.path.join(root, "textures/item_texture.json"),
           {"resource_pack_name": "rift_age", "texture_name": "atlas.items", "texture_data": tex})
     dest = os.path.join(OUT, "rift-age-bedrock.mcpack")
@@ -125,7 +143,7 @@ GEO = {"head": ("helmet", "helmet_layer_visible", 1), "chest": ("chestplate", "c
 
 def attachable(root, id, it, slot):
     geo, var, layer = GEO[slot]
-    s = id.rsplit("_", 1)[0]
+    s = it.get("set") or id.rsplit("_", 1)[0]
     write(os.path.join(root, "attachables", f"{NS}_{id}.json"), {
         "format_version": "1.10.0",
         "minecraft:attachable": {"description": {
@@ -135,6 +153,11 @@ def attachable(root, id, it, slot):
             "geometry": {"default": f"geometry.humanoid.armor.{geo}"},
             "scripts": {"parent_setup": f"variable.{var} = 0.0;"},
             "render_controllers": ["controller.render.armor"]}}})
+
+
+def all_sets():
+    out = [(s, pal) for s, (pal, _) in catalog.SETS.items()]
+    return out + [("outfit_" + o, o) for o in catalog.OUTFITS]
 
 
 def mk(*parts):

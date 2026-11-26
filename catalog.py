@@ -11,6 +11,8 @@ SETS = {  # armor sets: palette, Java base material prefix
     "stormguard": ("stormguard", "netherite"),
     "celestial": ("celestial", "golden"),
 }
+# Outfits only mobs wear (Marsh Wight, Tidecaller, weekly boss themes). Same pipeline as player armor.
+OUTFITS = ["marsh_wight", "tidecaller", "ember", "frost", "storm", "bone", "verdant", "void"]
 SLOTS = {"helmet": "head", "chestplate": "chest", "leggings": "legs", "boots": "feet"}
 
 ITEMS = {}
@@ -18,6 +20,11 @@ for s, (pal, base) in SETS.items():
     for piece, slot in SLOTS.items():
         ITEMS[f"{s}_{piece}"] = dict(shape=piece, pal=pal, base=f"{base}_{piece}", kind=f"armor:{slot}", bedrock=True,
                                      sparkle=s in ("voidheart", "celestial"), name=f"{s.title()} {piece.title()}")
+
+for o in OUTFITS:
+    for piece, slot in SLOTS.items():
+        ITEMS[f"outfit_{o}_{piece}"] = dict(shape=piece, pal=o, base=f"iron_{piece}", kind=f"armor:{slot}", bedrock=True,
+                                            sparkle=False, name=f"{o.replace('_', ' ').title()} {piece.title()}", set=f"outfit_{o}")
 
 def add(id, shape, pal, base, kind, bedrock=True, sparkle=False, name=None):
     ITEMS[id] = dict(shape=shape, pal=pal, base=base, kind=kind, bedrock=bedrock, sparkle=sparkle,
